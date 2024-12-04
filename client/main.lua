@@ -178,6 +178,7 @@ local function Reset()
     TriggerServerEvent('mh-hunters:server:stop')
 end
 
+
 local function SetPedOutfit(ped)
     local data = Config.Outfit
     local hearTexture = math.random(1, 5)
@@ -471,8 +472,10 @@ RegisterNetEvent('mh-hunters:client:startHunt', function(amount, cops)
 end)
 
 RegisterNetEvent('mh-hunters:client:stopHunt', function()
-    Stop()
+    isActive = false
+    Reset()
 end)
+
 
 RegisterNetEvent('mh-hunters:client:bypassEnable', function()
     bypass = true

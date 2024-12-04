@@ -3,6 +3,13 @@
 --[[ ===================================================== ]] --
 local QBCore = exports['qb-core']:GetCoreObject()
 local isbusy = false
+local activeHunters = {}
+
+
+local function HasActiveHunters(playerId)
+    return activeHunters[playerId] ~= nil
+end
+
 
 local function CountCops()
     local online = 0
@@ -18,16 +25,22 @@ end
 QBCore.Commands.Add("startHunt", "", {}, false, function(source, args)
     if args[1] and tonumber(args[1]) > 0 then
         local id = tonumber(args[1])
-        local amount = tonumber(args[2])
+        if HasActiveHunters(id) then
+            TriggerClientEvent('QBCore:Notify', source, "Player already has active hunters!", "error")
+            return
+        end
+        local amount = tonumber(args[2]) or Config.MinHunters
         if amount > Config.MaxVehicleSpawn then
             amount = Config.MaxVehicleSpawn
         end
         if Config.UseHunters then
+            activeHunters[id] = true
             isbusy = true
             TriggerClientEvent("mh-hunters:client:startHunt", id, amount, 0)
         end
     end
 end, 'admin')
+
 
 QBCore.Commands.Add("stopHunt", "", {}, false, function(source, args)
     if args[1] and tonumber(args[1]) > 0 then
@@ -40,23 +53,33 @@ end, 'admin')
 RegisterServerEvent('mh-hunters:server:start')
 AddEventHandler('mh-hunters:server:start', function(amount)
     local src = source
+    if HasActiveHunters(src) then
+        TriggerClientEvent('QBCore:Notify', src, "You already have hunters chasing you!", "error")
+        return
+    end
+
     if Config.EnableIfNoCopsOnline and not isbusy then
+        activeHunters[src] = true
         isbusy = true
         TriggerClientEvent("mh-hunters:client:startHunt", src, amount, CountCops())
-    else
-        if Config.UseHunters and not isbusy then
-            isbusy = true
-            TriggerClientEvent("mh-hunters:client:startHunt", src, amount, 0)
-        end
+    elseif Config.UseHunters and not isbusy then
+        activeHunters[src] = true
+        isbusy = true
+        TriggerClientEvent("mh-hunters:client:startHunt", src, amount, 0)
     end
 end)
+
 
 RegisterServerEvent('mh-hunters:server:stop')
 AddEventHandler('mh-hunters:server:stop', function()
     local src = source
-    isbusy = false
-    TriggerClientEvent("mh-hunters:client:stopHunt", source)
+    if activeHunters[src] then
+        activeHunters[src] = nil
+        TriggerClientEvent("mh-hunters:client:stopHunt", src)
+        isbusy = false
+    end
 end)
+
 
 RegisterNetEvent('police:server:policeAlert', function(text)
     local src = source
