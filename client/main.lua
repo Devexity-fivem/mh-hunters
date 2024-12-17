@@ -4,7 +4,7 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 local hunters = {}
 local blips = {}
-local spawnRadius = 250
+local spawnRadius = 175
 local hasNotify = false
 local huntingTimer = Config.HuntingTime
 local bypass = false
@@ -211,9 +211,9 @@ local function CreateBountyBlip(entity, label, location)
     local blip = GetBlipFromEntity(entity)
     if not DoesBlipExist(blip) then
         blip = AddBlipForEntity(entity)
-        SetBlipSprite(blip, 161)
+        SetBlipSprite(blip, 84)
         SetBlipScale(blip, 1.0)
-        SetBlipColour(blip, 5)
+        SetBlipColour(blip, 1)
         SetBlipAsShortRange(blip, true)
         BeginTextCommandSetBlipName('STRING')
         AddTextComponentString(label)
@@ -235,17 +235,17 @@ local function createPed(coords, vehicle, seat)
     SetPedInfiniteAmmo(ped, true, GetHashKey(weapon))	
     SetPedIntoVehicle(ped, vehicle, seat)
     if Config.UseCustumPedModel then SetPedOutfit(ped) end
-    SetEntityHealth(ped, 250)
-    SetPedArmour(ped, 100)
+    SetEntityHealth(ped, 450)
+    SetPedArmour(ped, 200)
     SetPedAsCop(ped, true)
     SetPedKeepTask(ped, true)
-    SetPedAccuracy(ped, 50)
+    SetPedAccuracy(ped, 70)
     SetPedDropsWeaponsWhenDead(ped, false)
     SetCanAttackFriendly(ped, false, true)
     SetPedCanSwitchWeapon(ped, true)
-    SetPedCombatAbility(ped, 100)
+    SetPedCombatAbility(ped, 2)
     SetPedCombatMovement(ped, 3)
-    SetPedCombatRange(ped, 2)
+    SetPedCombatRange(ped, 3)
     SetPedCombatAttributes(ped, 46, true)
     SetPedSeeingRange(ped, 150.0)
     SetPedHearingRange(ped, 150.0)
@@ -308,10 +308,10 @@ local function Chase(driver, codriver, vehicle)
                     if DoesEntityExist(driver) then
                         SetPedIntoVehicle(driver, vehicle, -1)
                         if DoesEntityExist(codriver) then SetPedIntoVehicle(codriver, vehicle, 0) end
-                        TaskVehicleDriveToCoord(driver, vehicle, coords.x, coords.y, coords.z, 100.0, 1.0, vehicle, 537133628, 1.0, true)
+                        TaskVehicleDriveToCoord(driver, vehicle, coords.x, coords.y, coords.z, 100.0, 1.0, vehicle, 537657916, 1.0, true)
                     else
                         if DoesEntityExist(codriver) then SetPedIntoVehicle(codriver, vehicle, -1) end
-                        TaskVehicleDriveToCoord(codriver, vehicle, coords.x, coords.y, coords.z, 100.0, 1.0, vehicle, 537133628, 1.0, true)
+                        TaskVehicleDriveToCoord(codriver, vehicle, coords.x, coords.y, coords.z, 100.0, 1.0, vehicle, 537657916, 1.0, true)
                     end
                 end
                 if DoesEntityExist(driver) then TaskCombatPed(driver, PlayerPedId(), 0, 16) end
