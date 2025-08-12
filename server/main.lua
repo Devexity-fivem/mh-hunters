@@ -90,9 +90,6 @@ local function msOrDefault(v, default)
     return v
 end
 
--- keep the SAME event name your client already calls:
--- 'mh-hunters:server:reviveAndJailFromHunters'
--- (we'll do jail -> revive inside)
 RegisterNetEvent('mh-hunters:server:reviveAndJailFromHunters', function(minutes, reason)
     local src = source
     minutes = tonumber(minutes) or 20
@@ -102,28 +99,27 @@ RegisterNetEvent('mh-hunters:server:reviveAndJailFromHunters', function(minutes,
     jailedRecently[src] = true
     SetTimeout(8000, function() jailedRecently[src] = nil end) -- anti-spam
 
-    local preJailDelay     = msOrDefault(Config.HunterPreJailDelay, 0)
-    local reviveAfterDelay = msOrDefault(Config.HunterReviveAfterJailDelay, 2000)
+    local reviveDelay = msOrDefault(Config.HunterReviveDelay, 3000)
+    local afterReviveDelay = msOrDefault(Config.HunterJailAfterReviveDelay, 1500)
 
-    -- 1) (optional) wait before jailing
-    SetTimeout(preJailDelay, function()
+    -- 1) wait BEFORE revive
+    SetTimeout(reviveDelay, function()
         if GetPlayerPing(src) == 0 then return end -- player left
 
-        -- 2) JAIL FIRST
-        if GetResourceState('rcore_prison') == 'started' then
-            exports['rcore_prison']:Jail(src, minutes, reason)
+        -- 2) revive (if wasabi is running)
+        if GetResourceState('wasabi_ambulance') == 'started' then
+            exports.wasabi_ambulance:RevivePlayer(src)
         else
-            print(('[mh-hunters] rcore_prison not started; cannot jail %d'):format(src))
-            return
+            print('[mh-hunters] wasabi_ambulance not started; skipping revive')
         end
 
-        -- 3) After jailing, wait a bit, then revive inside prison
-        SetTimeout(reviveAfterDelay, function()
+        -- 3) wait AFTER revive, then jail
+        SetTimeout(afterReviveDelay, function()
             if GetPlayerPing(src) == 0 then return end
-            if GetResourceState('wasabi_ambulance') == 'started' then
-                exports.wasabi_ambulance:RevivePlayer(src) -- server export
+            if GetResourceState('rcore_prison') == 'started' then
+                exports['rcore_prison']:Jail(src, minutes, reason)
             else
-                print('[mh-hunters] wasabi_ambulance not started; skipping revive after jail')
+                print(('[mh-hunters] rcore_prison not started; cannot jail %d'):format(src))
             end
         end)
     end)
