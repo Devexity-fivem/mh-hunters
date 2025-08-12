@@ -213,7 +213,7 @@ local function createPed(coords, vehicle, seat)
     SetPedArmour(ped, 100)
     SetPedAsCop(ped, true)
     SetPedKeepTask(ped, true)
-    SetPedAccuracy(ped, 50)
+    SetPedAccuracy(ped, 80)
     SetPedDropsWeaponsWhenDead(ped, false)
     SetCanAttackFriendly(ped, false, true)
     SetPedCanSwitchWeapon(ped, true)
@@ -522,21 +522,10 @@ CreateThread(function()
     end
 end)
 
--- Hunters kill the player -> ask server to jail us via rcore_prison
-local jailedFromHunters = false
-local hunterKillPending = false
 
 
-local function isHunterPed(ped)
-    for _, h in pairs(hunters) do
-        if h and ((h.driver and h.driver == ped) or (h.codriver and h.codriver == ped)) then
-            return true
-        end
-    end
-    return false
-end
 
-
+-- Hunters kill the player -> ask server to revive (wasabi) then jail (rcore_prison)
 local jailedFromHunters = false
 local hunterKillPending = false
 
