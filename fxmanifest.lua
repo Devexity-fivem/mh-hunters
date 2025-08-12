@@ -1,3 +1,4 @@
+
 --[[ ===================================================== ]]--
 --[[           MH AI Hunters Script by MaDHouSe            ]]--
 --[[ ===================================================== ]]--
@@ -10,8 +11,10 @@ author 'MaDHouSe'
 version '1.0.0'
 
 shared_scripts {
-    '@qb-core/shared/locale.lua',
-    'locales/en.lua', -- change en to your language
+    '@ox_lib/init.lua',
+    'locales/locale.lua',
+    'locales/en.lua',
+    'locales/*.lua',
     'config.lua',
 }
 
@@ -22,7 +25,9 @@ client_scripts {
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
     'server/main.lua',
-    'server/update.lua',
 }
+
+dependencies {'oxmysql', 'ox_lib'}
+
 
 lua54 'yes'
